@@ -1,0 +1,44 @@
+---
+title: "FigureS"
+author: "Chunling Liang"
+date: "2024/5/29"
+output: html_document
+---
+
+##FigureS1
+library(ggplot2)  
+library(dplyr)    
+data <- read.delim("FigureS1.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+data_select <- data("Bacteira",data$group)
+data_select <- data_select %>%
+  arrange(desc(phylum)) %>% 
+  mutate(lab.ypos = cumsum(ratio) - 0.5*ratio)
+p <- ggplot(data_select, aes(x = 2, y = ratio, fill = phylum)) + geom_bar(stat = "identity", color = "white") + coord_polar(theta = "y", start = 0) + geom_text(aes(y = lab.ypos, label = phylum), color = "white") + scale_fill_manual(limits=c("Gammaproteobacteria","Acidobacteria","Actinobacteria","Alphaproteobacteria","Chloroflexi","Deltaproteobacteria","Gemmatimonadetes","Bacteroidetes","Firmicutes","Planctomycetes","Nitrospirae","Verrucomicrobia","other"), values=c("#DC0000","#E64B35","#4DBBD5","#00A087","#3C5488","#F39B7F","#8491B4","#91D1C2","#7E6148","#B09C85","#E06E6E","#779FC6","#A8A8A8")) + theme_void()+xlim(0.5, 2.5)+theme(legend.position = "none")#C0271D
+p
+
+##FigureS2
+library(ggplot2)
+data <- read.delim("FigureS2.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+data$phylum <- factor(data$phylum,levels = c("Alphaproteobacteria","Deltaproteobacteria","Acidobacteria","Gemmatimonadetes","Bacteroidetes","Verrucomicrobia","Planctomycetes","Chloroflexi","Firmicutes","Actinobacteria","Chytridiomycota","Gammaproteobacteria","Nitrospirae","Tremellomycetes","Agaricomycetes","Schizoplasmodiida","Leotiomycetes","Cercozoa","Eurotiomycetes","Sordariomycetes","Tubulinea","Dothideomycetes","Ochrophyta","Ciliophora"))
+p <- ggplot(data,aes(phylum,Body_size))+geom_bar(data,mapping=aes(x=phylum,y=Body_size,fill=Group,color=Group),size=0.8,alpha=0.7,position="dodge", stat="identity", width = 0.75)+ scale_fill_manual(values=c("#D5141B","#00A087","#194CA2"))+scale_color_manual(values=c("#D5141B","#00A087","#194CA2"))+geom_point(data,mapping=aes(x=phylum,y=Body_size),color="black",size=0.6)+geom_line(data,mapping=aes(x=phylum,y=Body_size),position = position_dodge(0.1),color="black",size=0.5,group=1)+theme_bw()+theme(panel.grid=element_blank())+theme(axis.text.y = element_text(size = 7),axis.text.x=element_blank(),axis.title.x = element_blank(),axis.title.y = element_text(size = 10))+ylim(0,75)+ylab("Body size(μm)")+annotate("rect", xmin = 0, xmax =6.48,  ymin = -0.1, ymax = 3.2, alpha = 0.2,fill="#FAE3AD") + theme(panel.grid.major=element_blank(),panel.grid.minor=element_blank())+theme(strip.text = element_text(size = 12,face = 'bold',colour = "#B8733A"))+theme(legend.title = element_blank())+theme(legend.position = c(.5, .70))
+p
+
+##FigureS4 (A)
+library(ggplot2)
+library(ggsignif)
+library(ggpubr)
+library(RColorBrewer)
+data <- read.delim("FigureS4.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+p<- ggplot(data)+ geom_boxplot(mapping=aes(x=Group,y=CMTB,colour = Group), alpha = 0.5, size=1, width = 0.6)+ geom_jitter(mapping=aes(x=Group,y=CMTB,colour = Group), alpha = 0.8, size=1.5) + scale_color_manual(limits=c("Bacteria","Fungi","Protist"), values=c("#D5141B","#00A087","#194CA2")) + geom_signif(mapping=aes(x=Group,y=CMTB),comparisons = list(c("Bacteria", "Fungi"), c("Bacteria", "Protist"),c("Fungi", "Protist")), map_signif_level=T,tip_length=c(0,0,0,0,0,0), y_position = c(2.9,3.0,3.1), test = "t.test")+ theme_bw() + theme(panel.grid=element_blank()) + theme(legend.position = c(0.15,0.15)) + theme(axis.text.x = element_blank())+guides(fill=guide_legend(title = NULL))+theme(axis.title.x = element_blank())+ stat_summary(fun = "median", aes(x=Group, y=CMTB,group=1), size=0.8, geom = "line")+theme(legend.position = "none")
+p
+
+##FigureS6 (A)
+library(ggplot2)
+library(ggh4x)
+data <- read.delim("NST.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+data$group1<-factor(data$group1,levels = c("CK","Warming","addN","addP","addNP"))
+p <- ggplot(data=data,aes(x=group1,y=NST.i.ruzicka))+geom_col(aes(fill=group2),position = position_dodge(0.6),width = 0.5,show.legend = T)+
+scale_y_continuous(expand = c(0,0),limits = c(-0.1,0.75))+theme_minimal()+
+theme(panel.grid = element_blank(),axis.line.y = element_line(),axis.ticks.y = element_line())+annotate(geom = "segment",x=0.6,y=0,xend = 5.4,yend = 0)+scale_fill_manual(values = c("#D5141B","#00A087","#194CA2"))+guides(y=guide_axis_truncated(trunc_lower = 0,trunc_upper = 0.8))+geom_hline(yintercept = 0.5,lty=2,lwd=0.1,col="black")+theme(axis.title.x = element_blank(),legend.position = "none")
+p
+
