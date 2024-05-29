@@ -1,0 +1,58 @@
+---
+title: "Untitled"
+author: "Chunling Liang"
+date: "2024/5/29"
+output: html_document
+---
+
+##Figure1 (A)
+library(ggplot2)
+data <- read.delim("resistance.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+p <- ggplot(data) +geom_point(aes(x = Ln_bodysize, y = resistance, color = group),size=3,alpha=0.6) + geom_smooth(aes(x = Ln_bodysize, y = resistance, color = group),method = 'lm', formula = y ~ x, se = F,size=0.6) + stat_cor(aes(x = Ln_bodysize, y = resistance, color = group,label = paste(..rr.label.., ..p.label.., sep = "~")), method = "spearman",label.x=-1,label.y=c(-0.2,-0.12,-0.04,0.04,0.12))+scale_colour_manual(values = c(Warming="#ec1c24",addN="#fdbd10",addP="#0066b2",addNP="#ed7902"))+xlab("Ln(body size(μm))")+ylab("Resistance")+ theme_bw() + theme(panel.grid.major=element_line(colour=NA),panel.background = element_rect(fill = "transparent",colour = NA),plot.background = element_rect(fill = "transparent",colour = NA),panel.grid.minor = element_blank())+theme(legend.position = "none")
+p
+
+##Figure1 (D)
+library(ggplot2)
+data <- read.delim("Generalists.txt", sep="\t", row.names=NULL, stringsAsFactors=FALSE, check.names=FALSE)
+p <- ggplot(data) +geom_point(aes(x = Ln_body_size, y = G_ratio),color='#D5141B', size=3.2) + geom_smooth(aes(x = Ln_body_size, y = G_ratio),method = 'lm', formula = y ~ x, se = F,size=1.2,colour="black") + stat_cor(aes(x = Ln_body_size, y = G_ratio,label = paste(..rr.label.., ..p.label.., sep = "~")), method = "spearman")+theme(axis.text=element_text(colour='black',size=6))+xlab("Ln(body size(μm))")+ylab("Generalists/Total")+ theme_bw() + theme(panel.grid.major=element_line(colour=NA),panel.background = element_rect(fill = "transparent",colour = NA),plot.background = element_rect(fill = "transparent",colour = NA),panel.grid.minor = element_blank())+theme(legend.position = "none")
+p
+
+##Figure1 (E)
+library(psych)
+library(reshape2)
+library(ggplot2)
+env <- read.delim("env.txt", sep="\t", row.names=1, stringsAsFactors=FALSE, check.names=FALSE)
+spe <- read.delim("spe.txt", sep="\t", row.names=1, stringsAsFactors=FALSE, check.names=FALSE)
+spe <- spe[rownames(env), ]
+spearman <- corr.test(env, spe, method = 'spearman', adjust = 'none')
+r <- data.frame(spearman$r)  
+p <- data.frame(spearman$p)
+r$env <- rownames(r)
+p$env <- rownames(p)
+r <- melt(r, id = 'env')
+p <- melt(p, id = 'env')
+spearman <- cbind(r, p$value)
+colnames(spearman) <- c('env', 'spe', 'spearman_correlation', 'p.value')
+spearman$spe <- factor(spearman$spe, levels = colnames(spe))
+spearman$env <- factor(spearman$env,levels=c("Fungcbhif","GH31","Glucosidase","Invertase","nifH","nirK","nirS","NAG","Urease","phoD","ACP"))
+spearman$spe <- factor(spearman$spe,levels=c("Alphaproteobacteria","Deltaproteobacteria","Acidobacteria","Gemmatimonadetes","Bacteroidetes","Verrucomicrobia","Planctomycetes","Chloroflexi","Firmicutes","Actinobacteria","Chytridiomycota","Gammaproteobacteria","Nitrospirae","Tremellomycetes","Agaricomycetes","Schizoplasmodiida","Leotiomycetes","Cercozoa","Eurotiomycetes","Sordariomycetes","Tubulinea","Dothideomycetes","Ochrophyta","Ciliophora"))
+p <- ggplot() + geom_tile(data = spearman, aes(x = env, y = spe, fill = spearman_correlation)) + scale_fill_gradientn(colors = c('#2D6DB1', 'white', '#DC1623'), limit = c(-1, 1)) + theme(panel.grid = element_blank(), panel.background = element_blank(), legend.key = element_blank(), axis.ticks=element_blank(),axis.text.y = element_blank()) + scale_x_discrete(expand = c(0, 0)) + scale_y_discrete(expand = c(0, 0)) + labs(y = '', x = '', fill = 'Correlation')+theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5))
+spearman[which(spearman$p.value<0.001),'sig'] <- '***'
+spearman[which(spearman$p.value<0.01 & spearman$p.value>0.001),'sig'] <- '**'
+spearman[which(spearman$p.value<0.05 & spearman$p.value>0.01),'sig'] <- '*'
+pheatmap_plot <- p + geom_text(data = spearman, aes(x = env, y = spe, label = sig), size = 1.5)+theme(legend.position = "none")
+pheatmap_plot
+
+##Figure1 (F)
+p <- ggplot(data) +geom_point(aes(x = Ln_body_size, y = ck, colo ="#E65F17"), size=3) + geom_smooth(aes(x = Ln_body_size, y = ck),method = 'lm', formula = y ~ x, se = F,size=1.2,colour="black") + stat_cor(aes(x = Ln_body_size, y = ck,label = paste(..rr.label.., ..p.label.., sep = "~")), method = "spearman")+theme(axis.text=element_text(colour='black',size=6))+xlab("Ln(body size(μm))")+ylab("R value")+ theme_bw() + theme(panel.grid.major=element_line(colour=NA),panel.background = element_rect(fill = "transparent",colour = NA),plot.background = element_rect(fill = "transparent",colour = NA),panel.grid.minor = element_blank())+theme(legend.position = "none")
+p
+
+##Figure1 (G)
+data <- read.delim("D-value.txt", sep="\t", row.names=NULL,stringsAsFactors=FALSE, check.names=FALSE)
+data$phylum <- factor(data$phylum,levels = c("Alphaproteobacteria","Deltaproteobacteria","Acidobacteria","Gemmatimonadetes","Bacteroidetes","Verrucomicrobia","Planctomycetes","Chloroflexi","Firmicutes","Actinobacteria","Gammaproteobacteria","Nitrospirae","Chytridiomycota","Tremellomycetes","Agaricomycetes","Leotiomycetes","Eurotiomycetes","Sordariomycetes","Dothideomycetes","Schizoplasmodiida","Cercozoa","Tubulinea","Ochrophyta","Ciliophora"))
+data$group2 <- factor(data$group2,levels = c("Warming","addN","addP","addNP"))
+p <- ggplot(data, aes(x = reorder(phylum, phylum), y = D_value, fill = group1)) + geom_bar(stat = "identity", position = "identity", width = 0.8) +scale_fill_manual(values = c("steelblue", "firebrick3"), guide = "none") +annotate("segment", x = 0, y = 0, xend = 19.5, yend = 0, size = 0.3) + coord_flip(ylim = c(-0.3, 0.3), expand = 0, clip = "off") + theme_classic() + theme(axis.line = element_line(size = 0.2),axis.ticks = element_line(size = 0.3),axis.text.y = element_blank(),axis.text.x = element_text(colour = "black"),plot.margin = unit(c(2, 1, 1, 1), "cm")) + labs(x = "",y = "D-value")+theme(panel.border=element_rect(fill=NA))+facet_wrap(~group2, nrow =1)
+p
+
+
+
